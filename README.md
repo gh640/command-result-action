@@ -1,3 +1,11 @@
+# Command Result Action
+
+This action just runs a command and capture result outputs. Easy to use and useful to capture multi-line outputs.
+
+---
+
+Template README:
+
 <p align="center">
   <a href="https://github.com/actions/typescript-action/actions"><img alt="typescript-action status" src="https://github.com/actions/typescript-action/workflows/build-test/badge.svg"></a>
 </p>
