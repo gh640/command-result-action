@@ -20,5 +20,59 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./
+        id: cra_1
         with:
-          milliseconds: 1000
+          command: pwd
+      - uses: ./
+        id: cra_2
+        with:
+          command: pwd
+          cwd: ../
+      - run: |
+          {
+            echo '`exitCode`:'
+            echo ''
+            echo '```'
+            echo "${CRA_EXIT_CODE}"
+            echo '```'
+            echo ''
+            echo '`stdout`:'
+            echo ''
+            echo '```'
+            echo "${CRA_STDOUT}"
+            echo '```'
+            echo ''
+            echo '`stderr`:'
+            echo ''
+            echo '```'
+            echo "${CRA_STDERR}"
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
+        env:
+          CRA_EXIT_CODE: ${{ steps.cra_1.outputs.exitCode }}
+          CRA_STDOUT: ${{ steps.cra_1.outputs.stdout }}
+          CRA_STDERR: ${{ steps.cra_1.outputs.stderr }}
+      - run: |
+          {
+            echo '`exitCode`:'
+            echo ''
+            echo '```'
+            echo "${CRA_EXIT_CODE}"
+            echo '```'
+            echo ''
+            echo '`stdout`:'
+            echo ''
+            echo '```'
+            echo "${CRA_STDOUT}"
+            echo '```'
+            echo ''
+            echo '`stderr`:'
+            echo ''
+            echo '```'
+            echo "${CRA_STDERR}"
+            echo '```'
+          } >> $GITHUB_STEP_SUMMARY
+        env:
+          CRA_EXIT_CODE: ${{ steps.cra_2.outputs.exitCode }}
+          CRA_STDOUT: ${{ steps.cra_2.outputs.stdout }}
+          CRA_STDERR: ${{ steps.cra_2.outputs.stderr }}
