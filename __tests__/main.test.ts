@@ -47,9 +47,12 @@ const prepareEnv: prepareEnvType = vars => {
 }
 
 test('throws error on unknown command', async () => {
-  const result = await execMain(prepareEnv({INPUT_COMMAND: 'unknown'}))
-  expect(result.exitCode).toEqual(1)
-  expect(result.stdout).toContain(`Unable to locate executable file: unknown.`)
+  const {exitCode, stdout, stderr} = await execMain(
+    prepareEnv({INPUT_COMMAND: 'unknown'})
+  )
+  expect(exitCode).toEqual(1)
+  expect(stdout).toContain('Unable to locate executable file: unknown.')
+  expect(stderr).toContain('Error: Unable to locate executable file: unknown.')
 })
 
 test('properly handles single-line stdout', async () => {
@@ -57,21 +60,12 @@ test('properly handles single-line stdout', async () => {
     prepareEnv({INPUT_COMMAND: 'echo "Hello world"'})
   )
 
-  const expectedLines = [
-    'Starting command.',
-    '::group::command',
-    '[command]/bin/echo Hello world',
-    'Hello world',
-    '::endgroup::',
-    'Finished command.',
-    '',
-    '::set-output name=exitCode::0',
-    '',
-    '::set-output name=stdout::Hello world%0A',
-    '',
-    '::set-output name=stderr::'
-  ].join('\n')
-  expect(stdout.trim()).toEqual(expectedLines)
+  expect(stdout).toContain('Starting command.')
+  expect(stdout).toContain(['echo Hello world', 'Hello world'].join('\n'))
+  expect(stdout).toContain('Finished command.')
+  expect(stdout).toContain('::set-output name=exitCode::0')
+  expect(stdout).toContain('::set-output name=stdout::Hello world%0A')
+  expect(stdout).toContain('::set-output name=stderr::')
 })
 
 test('properly handles multi-line stdout (line breaks are escaped)', async () => {
@@ -79,23 +73,12 @@ test('properly handles multi-line stdout (line breaks are escaped)', async () =>
     prepareEnv({INPUT_COMMAND: 'echo "Hello\nworld"'})
   )
 
-  const expectedLines = [
-    'Starting command.',
-    '::group::command',
-    '[command]/bin/echo Hello',
-    'world',
-    'Hello',
-    'world',
-    '::endgroup::',
-    'Finished command.',
-    '',
-    '::set-output name=exitCode::0',
-    '',
-    '::set-output name=stdout::Hello%0Aworld%0A',
-    '',
-    '::set-output name=stderr::'
-  ].join('\n')
-  expect(stdout.trim()).toEqual(expectedLines)
+  expect(stdout).toContain('Starting command.')
+  expect(stdout).toContain(['echo Hello\nworld', 'Hello\nworld'].join('\n'))
+  expect(stdout).toContain('Finished command.')
+  expect(stdout).toContain('::set-output name=exitCode::0')
+  expect(stdout).toContain('::set-output name=stdout::Hello%0Aworld%0A')
+  expect(stdout).toContain('::set-output name=stderr::')
 })
 
 test('cwd', async () => {
@@ -106,19 +89,10 @@ test('cwd', async () => {
     })
   )
 
-  const expectedLines = [
-    'Starting command.',
-    '::group::command',
-    '[command]/bin/ls',
-    'main.js',
-    '::endgroup::',
-    'Finished command.',
-    '',
-    '::set-output name=exitCode::0',
-    '',
-    '::set-output name=stdout::main.js%0A',
-    '',
-    '::set-output name=stderr::'
-  ].join('\n')
-  expect(stdout.trim()).toEqual(expectedLines)
+  expect(stdout).toContain('Starting command.')
+  expect(stdout).toContain(['ls', 'main.js'].join('\n'))
+  expect(stdout).toContain('Finished command.')
+  expect(stdout).toContain('::set-output name=exitCode::0')
+  expect(stdout).toContain('::set-output name=stdout::main.js%0A')
+  expect(stdout).toContain('::set-output name=stderr::')
 })
