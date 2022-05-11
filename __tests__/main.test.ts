@@ -1,10 +1,10 @@
 import * as process from 'process'
 import * as cp from 'child_process'
 import * as path from 'path'
-import {promisify} from 'util'
 import {expect, test} from '@jest/globals'
 
 type CommandResult = {
+  exitCode: number
   stdout: string
   stderr: string
 }
@@ -12,14 +12,28 @@ type execMainType = {
   (env: NodeJS.ProcessEnv): Promise<CommandResult>
 }
 const execMain: execMainType = async env => {
-  const execFile = promisify(cp.execFile)
   const np = process.execPath
   const ip = path.join(__dirname, '..', 'lib', 'main.js')
-  const options: cp.ExecFileOptions = {env}
 
-  const result: CommandResult = await execFile(np, [ip], options)
+  let stdout = ''
+  let stderr = ''
 
-  return result
+  const child: cp.ChildProcess = cp.spawn(np, [ip], {env})
+
+  child.stdout?.on('data', data => {
+    stdout += data.toString()
+  })
+
+  child.stderr?.on('data', data => {
+    stderr += data.toString()
+  })
+
+  const exitCode: number = await new Promise((resolve, reject) => {
+    child.on('close', resolve)
+    child.on('error', reject)
+  })
+
+  return {exitCode, stdout, stderr}
 }
 
 type prepareEnvType = {
@@ -33,16 +47,9 @@ const prepareEnv: prepareEnvType = vars => {
 }
 
 test('throws error on unknown command', async () => {
-  expect.assertions(2)
-
-  try {
-    await execMain(prepareEnv({INPUT_COMMAND: 'unknown'}))
-  } catch (err: any) {
-    expect(err.code).toEqual(1)
-    expect(err.stderr.toString()).toContain(
-      `Unable to locate executable file: unknown.`
-    )
-  }
+  const result = await execMain(prepareEnv({INPUT_COMMAND: 'unknown'}))
+  expect(result.exitCode).toEqual(1)
+  expect(result.stdout).toContain(`Unable to locate executable file: unknown.`)
 })
 
 test('properly handles single-line stdout', async () => {
