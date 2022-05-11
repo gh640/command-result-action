@@ -1,5 +1,5 @@
 name: 'Command Result Action'
-description: 'Provide a description here'
+description: 'Runs a single command and captures the outputs.'
 author: 'Goto Hayato'
 inputs:
   command:

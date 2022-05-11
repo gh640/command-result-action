@@ -1,6 +1,6 @@
 # Command Result Action
 
-This is a reusable action for GitHub Actions. This action just runs a command and capture the outputs. Easy to use and useful to capture multi-line outputs.
+This is a reusable action for GitHub Actions. This action just runs a single command and captures the outputs. Easy to use and useful to capture multi-line outputs.
 
 ## Motivation
 
