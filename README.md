@@ -14,7 +14,7 @@ The way to capture a command's multi-line standard output / error is not intuiti
 Use this action `gh640/command-result-action` in your workflow with `command` input.
 
 ```yaml
-uses: gh640/command-result-action@main
+uses: gh640/command-result-action@v1
 with:
   command: npm outdated
 id: myaction
@@ -23,7 +23,7 @@ id: myaction
 You can optionally change the working directory by passing `cwd` as input:
 
 ```yaml
-uses: gh640/command-result-action@main
+uses: gh640/command-result-action@v1
 with:
   command: npm outdated
   cwd: ./src
