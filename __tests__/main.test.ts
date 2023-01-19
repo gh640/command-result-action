@@ -1,10 +1,12 @@
 import * as cp from 'child_process'
 import * as fs from 'fs'
-import * as os from 'os'
 import * as path from 'path'
 import * as process from 'process'
 
-import {describe, expect, test} from '@jest/globals'
+import {afterAll, beforeAll, describe, expect, test} from '@jest/globals'
+
+const outDirParent = path.join(__dirname, 'test')
+const outDirPrefix = path.join(outDirParent, 'out-')
 
 type CommandResult = {
   exitCode: number
@@ -50,6 +52,16 @@ const prepareEnv: prepareEnvType = vars => {
 }
 
 describe('lib/main.js', () => {
+  beforeAll(() => {
+    if (!fs.existsSync(outDirParent)) {
+      fs.mkdirSync(outDirParent)
+    }
+  })
+
+  afterAll(() => {
+    fs.rmSync(outDirParent, {recursive: true})
+  })
+
   test('properly handles single-line stdout', async () => {
     const [outFile, readOutFile] = tempFile()
     const {stdout} = await execMain(
@@ -148,7 +160,7 @@ describe('lib/main.js', () => {
  * Helper: prepare a temporary file.
  */
 function tempFile(): [string, () => string] {
-  const directory = fs.mkdtempSync(os.tmpdir())
+  const directory = fs.mkdtempSync(outDirPrefix)
   const file = path.join(directory, 'out')
   fs.appendFileSync(file, '', {encoding: 'utf8'})
 
