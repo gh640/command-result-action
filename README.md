@@ -72,7 +72,7 @@ id: myaction
 
 ## Working Example
 
-- [GitHub - gh640/test-command-result-action: https://github.com/gh640/command-result-action](https://github.com/gh640/test-command-result-action)
+- [GitHub - gh640/test-command-result-action](https://github.com/gh640/test-command-result-action)
 
 ## Questions
 
