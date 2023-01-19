@@ -130,7 +130,8 @@ describe('lib/main.js', () => {
     expect(stderr).toContain('')
 
     // `[\w-]` matches the delimtier.
-    expect(outFileContent).toMatch(/exitCode<<[\w-]+\n1\n/)
+    // The `exitCode` can be 1 or 2 depending on the environment.
+    expect(outFileContent).toMatch(/exitCode<<[\w-]+\n[12]\n/)
     expect(outFileContent).toMatch(/stdout<<[\w-]+\n\n/)
     expect(outFileContent).toMatch(
       /stderr<<[\w-]+\n.*No such file or directory\n/
