@@ -51,6 +51,28 @@ You can use the output in subsequent steps. In the above case, the following var
 | `stdout` | Stdout of the command |
 | `stderr` | Stderr of the command |
 
+### Migrating from a standard `run` command
+
+Change this
+
+```yaml
+run: npm outdated
+working-directory: ./src
+id: myaction
+```
+
+to
+
+```yaml
+uses: gh640/command-result-action@v1
+with:
+  command: npm outdated
+  cwd: ./src
+id: myaction
+```
+
+Please keep in mind that the run will not fail and subsequent steps will be executed even if the command exit code is not `0` when using `gh640/command-result-action`.
+
 ## Different approaches to capture standard output / error
 
 ### `actions/github-script` action
