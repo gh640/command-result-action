@@ -80,7 +80,7 @@ Please keep in mind that the run will not fail and subsequent steps will be exec
 This action uses `@actions/exec` and `@actions/core`. The behavior of this action is almost same as one of the following action with `actions/github-script`:
 
 ```yaml
-uses: actions/github-script@v6
+uses: actions/github-script@v8
 with:
   script: |
     const result = await exec.getExecOutput('npm outdated', [], {
