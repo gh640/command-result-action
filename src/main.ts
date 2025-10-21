@@ -6,10 +6,10 @@ process.on('unhandledRejection', handleError)
 main().catch(handleError)
 
 async function main(): Promise<void> {
-  const command: string = core.getInput('command', {required: true})
+  const command: string = core.getInput('command', { required: true })
   const cwd: string = core.getInput('cwd')
 
-  const options: exec.ExecOptions = {ignoreReturnCode: true}
+  const options: exec.ExecOptions = { ignoreReturnCode: true }
   if (cwd != null) {
     options.cwd = cwd
   }
