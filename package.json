@@ -24,7 +24,7 @@
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.10.1",
-    "@actions/exec": "^1.1.1"
+    "@actions/exec": "^3.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.13",
