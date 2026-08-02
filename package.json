@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.1",
-    "@types/node": "^24.10.1",
+    "@types/node": "^26.1.2",
     "@vercel/ncc": "^0.38.1",
     "jest": "^30.4.2",
     "js-yaml": "^5.2.2",
