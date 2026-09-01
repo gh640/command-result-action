@@ -30,7 +30,7 @@
     "@biomejs/biome": "^2.5.1",
     "@types/node": "^26.1.2",
     "@vercel/ncc": "^0.44.1",
-    "jest": "^30.4.2",
+    "jest": "^30.5.0",
     "js-yaml": "^5.2.2",
     "ts-jest": "^29.4.12",
     "typescript": "^6.0.3"
