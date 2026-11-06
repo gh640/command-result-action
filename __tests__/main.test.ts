@@ -14,11 +14,11 @@ type CommandResult = {
   stderr: string
 }
 type execMainType = {
-  (env: NodeJS.ProcessEnv): Promise<CommandResult>
+  (env: NodeJS.ProcessEnv, entrypoint: string): Promise<CommandResult>
 }
-const execMain: execMainType = async env => {
+const execMain: execMainType = async (env, entrypoint) => {
   const np = process.execPath
-  const ip = path.join(__dirname, '..', 'lib', 'main.js')
+  const ip = path.join(__dirname, '..', entrypoint)
 
   let stdout = ''
   let stderr = ''
@@ -51,7 +51,9 @@ const prepareEnv: prepareEnvType = vars => {
   }
 }
 
-describe('lib/main.js', () => {
+describe.each(['lib/main.js', 'dist/index.js'])('%s', entrypoint => {
+  const runMain = (env: NodeJS.ProcessEnv): Promise<CommandResult> =>
+    execMain(env, entrypoint)
   beforeAll(() => {
     if (!fs.existsSync(outDirParent)) {
       fs.mkdirSync(outDirParent)
@@ -64,7 +66,7 @@ describe('lib/main.js', () => {
 
   test('properly handles single-line stdout', async () => {
     const [outFile, readOutFile] = tempFile()
-    const {stdout} = await execMain(
+    const {stdout} = await runMain(
       prepareEnv({
         INPUT_COMMAND: 'echo "Hello world"',
         GITHUB_OUTPUT: outFile
@@ -84,7 +86,7 @@ describe('lib/main.js', () => {
 
   test('properly handles multi-line stdout', async () => {
     const [outFile, readOutFile] = tempFile()
-    const {stdout} = await execMain(
+    const {stdout} = await runMain(
       prepareEnv({
         INPUT_COMMAND: 'echo "Hello\nworld"',
         GITHUB_OUTPUT: outFile
@@ -100,7 +102,7 @@ describe('lib/main.js', () => {
 
   test('works with option `cwd`', async () => {
     const [outFile, readOutFile] = tempFile()
-    const {stdout} = await execMain(
+    const {stdout} = await runMain(
       prepareEnv({
         INPUT_COMMAND: 'ls',
         INPUT_CWD: './lib',
@@ -117,7 +119,7 @@ describe('lib/main.js', () => {
 
   test('properly captures stderr', async () => {
     const [outFile, readOutFile] = tempFile()
-    const {exitCode, stdout, stderr} = await execMain(
+    const {exitCode, stdout, stderr} = await runMain(
       prepareEnv({
         INPUT_COMMAND: 'ls /unkown/path/',
         GITHUB_OUTPUT: outFile
@@ -127,7 +129,6 @@ describe('lib/main.js', () => {
 
     expect(exitCode).toEqual(0)
     expect(stdout).toContain('ls /unkown/path/')
-    expect(stderr).toContain('')
 
     // `[\w-]` matches the delimtier.
     // The `exitCode` can be 1 or 2 depending on the environment.
@@ -140,7 +141,7 @@ describe('lib/main.js', () => {
 
   test('fails with unknown command', async () => {
     const [outFile, readOutFile] = tempFile()
-    const {exitCode, stdout, stderr} = await execMain(
+    const {exitCode, stdout, stderr} = await runMain(
       prepareEnv({
         INPUT_COMMAND: 'unknown',
         GITHUB_OUTPUT: outFile
@@ -154,6 +155,32 @@ describe('lib/main.js', () => {
       'Error: Unable to locate executable file: unknown.'
     )
     expect(outFileContent).toEqual('')
+  })
+
+  test('captures both streams and preserves a nonzero command exit code', async () => {
+    const [outFile, readOutFile] = tempFile()
+    const {exitCode} = await runMain(
+      prepareEnv({
+        INPUT_COMMAND: `"${process.execPath}" -e "process.stdout.write('out'); process.stderr.write('err'); process.exit(7)"`,
+        GITHUB_OUTPUT: outFile
+      })
+    )
+
+    // A failed command is reported as an output; it does not fail the Action.
+    expect(exitCode).toEqual(0)
+    expect(readOutFile()).toMatch(/exitCode<<[\w-]+\n7\n/)
+    expect(readOutFile()).toMatch(/stdout<<[\w-]+\nout\n/)
+    expect(readOutFile()).toMatch(/stderr<<[\w-]+\nerr\n/)
+  })
+
+  test('fails when the required command is empty', async () => {
+    const [outFile, readOutFile] = tempFile()
+    const {exitCode} = await runMain(
+      prepareEnv({INPUT_COMMAND: '', GITHUB_OUTPUT: outFile})
+    )
+
+    expect(exitCode).toEqual(1)
+    expect(readOutFile()).toEqual('')
   })
 })
 
