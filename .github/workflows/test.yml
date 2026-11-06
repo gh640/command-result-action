@@ -11,8 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.0.0
+        with:
+          node-version: 24.x
       - run: |
-          npm install
+          npm ci
       - run: |
           npm run all
   test: # make sure the action works on a clean machine without building
